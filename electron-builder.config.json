@@ -1,0 +1,58 @@
+{
+  "appId": "com.rbiprepos2027.app",
+  "productName": "RBI Prep OS 2027",
+  "copyright": "Copyright © 2027 RBI Prep OS",
+  "directories": {
+    "output": "release",
+    "buildResources": "build-resources"
+  },
+  "files": [
+    "dist/**/*",
+    "dist-electron/**/*",
+    "assets/icons/**/*",
+    "package.json"
+  ],
+  "extraResources": [
+    {
+      "from": "public",
+      "to": "public",
+      "filter": ["**/*.png", "**/*.ico", "**/*.webmanifest"]
+    },
+    {
+      "from": "assets/icons",
+      "to": "assets/icons",
+      "filter": ["**/*"]
+    }
+  ],
+  "win": {
+    "target": [
+      { "target": "nsis", "arch": ["x64"] },
+      { "target": "portable", "arch": ["x64"] }
+    ],
+    "icon": "assets/icons/app.ico",
+    "requestedExecutionLevel": "asInvoker",
+    "artifactName": "${productName}-${version}-Setup.${ext}"
+  },
+  "nsis": {
+    "oneClick": true,
+    "allowToChangeInstallationDirectory": false,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "RBI Prep OS 2027",
+    "uninstallDisplayName": "RBI Prep OS 2027",
+    "deleteAppDataOnUninstall": false
+  },
+  "mac": {
+    "target": ["dmg"],
+    "category": "public.app-category.education",
+    "icon": "public/pwa-512x512.png",
+    "artifactName": "${productName}-${version}.${ext}"
+  },
+  "linux": {
+    "target": ["AppImage"],
+    "icon": "public/pwa-512x512.png",
+    "category": "Education",
+    "artifactName": "${productName}-${version}.${ext}"
+  },
+  "publish": null
+}

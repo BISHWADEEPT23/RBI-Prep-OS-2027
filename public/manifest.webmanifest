@@ -1,0 +1,31 @@
+{
+  "name": "RBI Prep OS 2027 — Personal Study Command Center",
+  "short_name": "RBI Prep OS",
+  "description": "Local-First Hybrid Study Operating System for RBI Grade B/A 2027 preparation with offline IndexedDB persistence, Screenshot-to-Notes Studio, Focus Room, Spaced Repetition, and optional Cloud Sync.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F6FAF7",
+  "theme_color": "#427968",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "pwa-maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isVerifiedOwner(userId) {
+      return request.auth != null
+        && request.auth.uid == userId
+        && request.auth.token.email_verified == true;
+    }
+
+    function isValidSegmentId(id) {
+      return id is string
+        && id.size() >= 1
+        && id.size() <= 128
+        && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidSafeFilename(fileName) {
+      return fileName is string
+        && fileName.size() >= 1
+        && fileName.size() <= 100
+        && fileName.matches('^[a-zA-Z0-9._\\-]+\\.(png|jpg|jpeg|webp|pdf|PNG|JPG|JPEG|WEBP|PDF)$');
+    }
+
+    function isValidAttachmentUpload(userId) {
+      return request.resource != null
+        && request.resource.size > 0
+        && request.resource.size <= 10 * 1024 * 1024
+        && request.resource.contentType in [
+          'image/png',
+          'image/jpeg',
+          'image/webp',
+          'application/pdf'
+        ]
+        && (
+          !('ownerUid' in request.resource.metadata) ||
+          request.resource.metadata.ownerUid == userId
+        );
+    }
+
+    // Canonical Patch 02 user-scoped attachment path
+    match /users/{userId}/study-attachments/{attachmentId}/{fileName} {
+      allow read, delete: if isVerifiedOwner(userId)
+        && isValidSegmentId(userId)
+        && isValidSegmentId(attachmentId)
+        && isValidSafeFilename(fileName);
+
+      allow create: if isVerifiedOwner(userId)
+        && isValidSegmentId(userId)
+        && isValidSegmentId(attachmentId)
+        && isValidSafeFilename(fileName)
+        && isValidAttachmentUpload(userId);
+
+      allow update: if false;
+    }
+
+    // Backward-compatible Patch 02 foundation path
+    match /users/{userId}/study-files/{fileId}/{fileName} {
+      allow read, delete: if isVerifiedOwner(userId)
+        && isValidSegmentId(userId)
+        && isValidSegmentId(fileId)
+        && isValidSafeFilename(fileName);
+
+      allow create: if isVerifiedOwner(userId)
+        && isValidSegmentId(userId)
+        && isValidSegmentId(fileId)
+        && isValidSafeFilename(fileName)
+        && isValidAttachmentUpload(userId);
+
+      allow update: if false;
+    }
+
+    // Default-deny catch-all
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

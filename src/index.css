@@ -1,0 +1,520 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --md-primary: #158e7f;
+  --md-on-primary: #ffffff;
+  --md-primary-container: #d6f8ec;
+  --md-on-primary-container: #0b8274;
+  --md-secondary: #3b6d66;
+  --md-on-secondary: #ffffff;
+  --md-secondary-container: #c9efdf;
+  --md-on-secondary-container: #166f61;
+  --md-tertiary: #416277;
+  --md-tertiary-container: #c5e7ff;
+  --md-on-tertiary-container: #001e2d;
+  --md-surface: #ffffff;
+  --md-surface-container-low: #ffffff;
+  --md-surface-container: #f7f7f7;
+  --md-surface-container-high: #efefef;
+  --md-on-surface: #202c32;
+  --md-on-surface-variant: #555e60;
+  --md-outline: #858b8e;
+  --md-outline-variant: #ebebeb;
+  --md-error: #ba1a1a;
+  --md-error-container: #ffdad6;
+  --md-on-error-container: #410002;
+  --md-inverse-surface: #173f3b;
+  --md-inverse-on-surface: #ffffff;
+  --canvas-bg: #e4e4e4;
+  --shell-bg: #f7f7f7;
+
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  color: var(--md-on-surface);
+  background: var(--canvas-bg);
+  font-synthesis: none;
+}
+
+.dark {
+  --md-primary: #7ed9c8;
+  --md-on-primary: #083730;
+  --md-primary-container: #144e45;
+  --md-on-primary-container: #d6f8ec;
+  --md-secondary: #a5d6c7;
+  --md-on-secondary: #153831;
+  --md-secondary-container: #1f473f;
+  --md-on-secondary-container: #c9efdf;
+  --md-tertiary: #a9cbe2;
+  --md-tertiary-container: #284b5e;
+  --md-on-tertiary-container: #c5e7ff;
+  --md-surface: #1b2225;
+  --md-surface-container-low: #1b2225;
+  --md-surface-container: #141a1d;
+  --md-surface-container-high: #252e32;
+  --md-on-surface: #e4ecee;
+  --md-on-surface-variant: #a2b0b5;
+  --md-outline: #6c7a80;
+  --md-outline-variant: #2c373b;
+  --md-error: #ffb4ab;
+  --md-error-container: #93000a;
+  --md-on-error-container: #ffdad6;
+  --md-inverse-surface: #d6f8ec;
+  --md-inverse-on-surface: #0b3932;
+  --canvas-bg: #0d1214;
+  --shell-bg: #141a1d;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--canvas-bg);
+  color: var(--md-on-surface);
+  -webkit-font-smoothing: antialiased;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+/* Windows 11 Fluent Slim Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(120, 140, 135, 0.28);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(66, 121, 104, 0.55);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid #7ed9c8;
+  outline-offset: 2px;
+}
+
+/* Reference Shell & Layout */
+.rbi-shell {
+  max-width: 1510px;
+  margin: auto;
+  background: var(--shell-bg);
+  border-radius: 24px;
+  min-height: 900px;
+  padding: 22px;
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  grid-template-rows: 66px 1fr;
+  gap: 20px;
+  box-shadow: 0 12px 40px #00000009;
+}
+
+.rbi-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-left: 14px;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -1.2px;
+  color: var(--md-on-surface);
+  text-decoration: none;
+}
+
+.rbi-brand-mark {
+  color: #178d7c;
+  font-size: 28px;
+}
+
+.rbi-topbar {
+  background: var(--md-surface);
+  border-radius: 23px;
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+  gap: 12px;
+}
+
+.rbi-search {
+  flex: 1;
+  border: 1px solid var(--md-outline-variant);
+  border-radius: 15px;
+  padding: 11px 16px;
+  min-width: 70px;
+  background: var(--md-surface);
+  color: var(--md-on-surface);
+  font-size: 14px;
+}
+
+.rbi-export-btn {
+  border: 1px solid var(--md-outline-variant);
+  border-radius: 15px;
+  padding: 10px 16px;
+  background: var(--md-surface);
+  color: var(--md-on-surface);
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.rbi-icon-btn {
+  width: 43px;
+  height: 43px;
+  border: 1px solid var(--md-outline-variant);
+  border-radius: 50%;
+  background: var(--md-surface);
+  color: var(--md-on-surface);
+  font-size: 19px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.rbi-avatar {
+  width: 43px;
+  height: 43px;
+  border-radius: 50%;
+  background: #ffcf76;
+  color: #202c32;
+  display: grid;
+  place-items: center;
+  font-size: 21px;
+  flex-shrink: 0;
+  border: 0;
+}
+
+.rbi-sidebar {
+  grid-column: 1;
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.rbi-side-card {
+  background: var(--md-surface);
+  border-radius: 24px;
+  padding: 12px;
+}
+
+.rbi-nav-item {
+  border: 0;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 14px;
+  border-radius: 15px;
+  font-size: 14.5px;
+  color: var(--md-on-surface);
+  transition: background-color 0.15s ease;
+}
+
+.rbi-nav-item:hover {
+  background: var(--md-surface-container);
+}
+
+.rbi-nav-item .symbol {
+  font-size: 18px;
+  width: 22px;
+  text-align: center;
+}
+
+.rbi-nav-item.active {
+  background: var(--md-primary-container);
+  color: var(--md-on-primary-container);
+  font-weight: 700;
+}
+
+.rbi-side-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--md-on-surface);
+}
+
+.rbi-list-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 10px;
+  font-size: 14px;
+  border-radius: 12px;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--md-on-surface);
+  text-align: left;
+}
+
+.rbi-list-item:hover {
+  background: var(--md-surface-container);
+}
+
+.rbi-dot {
+  margin-left: auto;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Main 2-Column Reference Dashboard */
+.rbi-dashboard-grid {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(310px, 1fr);
+  grid-auto-rows: min-content;
+  gap: 16px;
+}
+
+.rbi-panel {
+  background: var(--md-surface);
+  border-radius: 24px;
+  padding: 16px;
+  min-width: 0;
+}
+
+/* Mint Landscape Hero Banner */
+.rbi-hero {
+  min-height: 330px;
+  position: relative;
+  overflow: hidden;
+  border: 7px solid var(--md-surface);
+  padding: 30px;
+  border-radius: 24px;
+  background: linear-gradient(170deg, #aee8e2 0%, #dfffe0 45%, #b8e2c7 100%);
+  color: #173f3b;
+}
+
+.rbi-hero h1 {
+  font-size: 31px;
+  font-weight: 700;
+  margin: 0 0 7px;
+  letter-spacing: -1px;
+  color: #173f3b;
+}
+
+.rbi-hero p {
+  margin: 0;
+  color: #234b46;
+  font-size: 15px;
+}
+
+.rbi-hills {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 55%;
+  background: #3b6d66;
+  clip-path: polygon(0 80%, 10% 66%, 20% 70%, 30% 50%, 40% 70%, 55% 85%, 70% 64%, 83% 78%, 100% 60%, 100% 100%, 0 100%);
+  pointer-events: none;
+}
+
+.rbi-hills::after {
+  content: '';
+  position: absolute;
+  inset: 45% 0 0;
+  background: #86cbb1;
+}
+
+.rbi-tree {
+  position: absolute;
+  bottom: 22px;
+  width: 28px;
+  height: 145px;
+  background: #1e544f;
+  clip-path: polygon(50% 0, 95% 75%, 72% 75%, 72% 100%, 28% 100%, 28% 75%, 5% 75%);
+  pointer-events: none;
+}
+
+.rbi-tree.one {
+  left: 22%;
+}
+
+.rbi-tree.two {
+  left: 31%;
+  height: 175px;
+  width: 44px;
+}
+
+.rbi-upnext {
+  position: relative;
+  z-index: 2;
+  margin-top: 24px;
+  margin-left: auto;
+  background: #ffffffed;
+  color: #202c32;
+  border-radius: 16px;
+  padding: 16px;
+  width: 265px;
+  box-shadow: 0 8px 20px #234b4620;
+}
+
+/* Mint Forest Focus Timer Card */
+.rbi-timer-card {
+  min-height: 365px;
+  background: #c9efdf;
+  color: #173f3b;
+  position: relative;
+  overflow: hidden;
+  padding: 25px;
+  border-radius: 24px;
+}
+
+.rbi-timer-card h2 {
+  font-size: 25px;
+  font-weight: 700;
+  margin: 0 0 6px;
+  color: #173f3b;
+}
+
+.rbi-forest {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 95px;
+  background: linear-gradient(
+    135deg,
+    transparent 0 10%,
+    #285f52 10% 13%,
+    transparent 13% 18%,
+    #285f52 18% 23%,
+    transparent 23% 30%,
+    #194b43 30% 35%,
+    transparent 35% 42%,
+    #285f52 42% 48%,
+    transparent 48% 55%,
+    #194b43 55% 60%,
+    transparent 60% 70%,
+    #285f52 70% 76%,
+    transparent 76% 83%,
+    #194b43 83% 90%,
+    transparent 90%
+  );
+  opacity: 0.9;
+  clip-path: polygon(
+    0 70%,
+    5% 18%,
+    11% 65%,
+    16% 0,
+    24% 65%,
+    30% 20%,
+    38% 80%,
+    47% 3%,
+    55% 70%,
+    63% 25%,
+    70% 80%,
+    79% 5%,
+    87% 80%,
+    94% 10%,
+    100% 65%,
+    100% 100%,
+    0 100%
+  );
+  pointer-events: none;
+}
+
+.font-display {
+  font-family: 'DM Sans', 'Plus Jakarta Sans', sans-serif;
+}
+
+.font-mono-tabular {
+  font-family: 'JetBrains Mono', monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+.material-symbols-rounded {
+  font-family: 'Material Symbols Rounded';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+@media (max-width: 1100px) {
+  body {
+    padding: 12px;
+  }
+  .rbi-shell {
+    grid-template-columns: 190px 1fr;
+    padding: 14px;
+    gap: 14px;
+  }
+  .rbi-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    padding: 0;
+  }
+  .rbi-shell {
+    display: block;
+    border-radius: 0;
+    min-height: 100vh;
+    padding: 14px;
+  }
+  .rbi-brand {
+    padding: 4px 0 12px;
+  }
+  .rbi-topbar {
+    margin-bottom: 14px;
+  }
+  .rbi-sidebar {
+    display: none;
+  }
+  .rbi-sidebar.open {
+    display: flex;
+    margin-bottom: 16px;
+  }
+  .rbi-dashboard-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+}

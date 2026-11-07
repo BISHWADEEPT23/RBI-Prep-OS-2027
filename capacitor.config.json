@@ -1,0 +1,15 @@
+{
+  "appId": "com.rbiprepos2027.app",
+  "appName": "RBI Prep OS 2027",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "CapacitorSQLite": {
+      "iosDatabaseLocation": "Library/CapacitorDatabase",
+      "androidIsEncryption": false
+    }
+  }
+}

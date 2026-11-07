@@ -1,0 +1,373 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function hasWorkspace(userId) {
+      return exists(/databases/$(database)/documents/users/$(userId));
+    }
+
+    function isValidUserWorkspace(data) {
+      return data.userId is string && data.userId.size() <= 128 && data.userId.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.userId == request.auth.uid &&
+        data.themeSeed is string && data.themeSeed.size() <= 32 &&
+        data.themeMode is string && data.themeMode.size() <= 16 && data.themeMode in ['light', 'dark', 'system'] &&
+        data.dailyGoalMinutes is number && data.dailyGoalMinutes >= 15 && data.dailyGoalMinutes <= 960 &&
+        (!('displayName' in data) || (data.displayName is string && data.displayName.size() <= 120)) &&
+        (!('officeStart' in data) || (data.officeStart is string && data.officeStart.size() <= 10)) &&
+        (!('officeEnd' in data) || (data.officeEnd is string && data.officeEnd.size() <= 10)) &&
+        (!('workDays' in data) || (data.workDays is string && data.workDays.size() <= 64)) &&
+        (!('revisionIntervals' in data) || (data.revisionIntervals is string && data.revisionIntervals.size() <= 64)) &&
+        (!('activeTimerJson' in data) || (data.activeTimerJson is string && data.activeTimerJson.size() <= 5000)) &&
+        (!('customSubjectsJson' in data) || (data.customSubjectsJson is string && data.customSubjectsJson.size() <= 20000)) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidTopic(data) {
+      return data.userId is string && data.userId.size() <= 128 && data.userId.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.userId == request.auth.uid &&
+        data.phase is string && data.phase.size() <= 64 &&
+        data.subject is string && data.subject.size() <= 120 &&
+        data.chapter is string && data.chapter.size() <= 160 &&
+        data.title is string && data.title.size() >= 1 && data.title.size() <= 200 &&
+        data.status is string && data.status.size() <= 40 &&
+        data.status in ['Not Started', 'In Progress', 'Lecture Completed', 'Practice Completed', 'Revision Due', 'Mastered'] &&
+        data.studyMinutes is number && data.studyMinutes >= 0 &&
+        data.confidence is number && data.confidence >= 0 && data.confidence <= 5 &&
+        (!('practiceAccuracy' in data) || (data.practiceAccuracy is number && data.practiceAccuracy >= 0 && data.practiceAccuracy <= 100)) &&
+        (!('revisionStage' in data) || (data.revisionStage is number && data.revisionStage >= 0)) &&
+        (!('nextRevisionDate' in data) || (data.nextRevisionDate is string && data.nextRevisionDate.size() <= 32)) &&
+        (!('lastStudiedAt' in data) || (data.lastStudiedAt is string && data.lastStudiedAt.size() <= 40)) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidStudySession(data) {
+      return data.userId is string && data.userId.size() <= 128 && data.userId.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.userId == request.auth.uid &&
+        data.phase is string && data.phase.size() <= 64 &&
+        data.subject is string && data.subject.size() <= 120 &&
+        data.topicId is string && data.topicId.size() <= 128 &&
+        data.topicTitle is string && data.topicTitle.size() <= 200 &&
+        data.focusedMinutes is number && data.focusedMinutes >= 0 &&
+        data.pausedMinutes is number && data.pausedMinutes >= 0 &&
+        data.confidence is number && data.confidence >= 1 && data.confidence <= 5 &&
+        data.sessionDate is string && data.sessionDate.size() <= 32 &&
+        (!('goal' in data) || (data.goal is string && data.goal.size() <= 500)) &&
+        (!('timerMode' in data) || (data.timerMode is string && data.timerMode.size() <= 24 && data.timerMode in ['stopwatch', 'countdown', 'pomodoro'])) &&
+        (!('plannedMinutes' in data) || (data.plannedMinutes is number && data.plannedMinutes >= 0)) &&
+        (!('outcome' in data) || (data.outcome is string && data.outcome.size() <= 120)) &&
+        (!('notesSummary' in data) || (data.notesSummary is string && data.notesSummary.size() <= 4000)) &&
+        (!('screenshotsCount' in data) || (data.screenshotsCount is number && data.screenshotsCount >= 0)) &&
+        (!('suggestedRevisionDate' in data) || (data.suggestedRevisionDate is string && data.suggestedRevisionDate.size() <= 32)) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidRoutineTask(data) {
+      return data.userId is string && data.userId.size() <= 128 && data.userId.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.userId == request.auth.uid &&
+        data.title is string && data.title.size() >= 1 && data.title.size() <= 200 &&
+        data.category is string && data.category.size() <= 32 && data.category in ['lesson', 'revision', 'practice', 'current_affairs', 'mock'] &&
+        data.subject is string && data.subject.size() <= 120 &&
+        data.date is string && data.date.size() <= 32 &&
+        data.startTime is string && data.startTime.size() <= 16 &&
+        data.durationMinutes is number && data.durationMinutes >= 5 && data.durationMinutes <= 600 &&
+        data.priority is string && data.priority.size() <= 16 && data.priority in ['high', 'medium', 'low'] &&
+        data.status is string && data.status.size() <= 24 && data.status in ['planned', 'completed', 'missed', 'rescheduled'] &&
+        (!('topicId' in data) || (data.topicId is string && data.topicId.size() <= 128)) &&
+        (!('isRecurring' in data) || (data.isRecurring is bool)) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidVaultNote(data) {
+      return data.userId is string && data.userId.size() <= 128 && data.userId.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.userId == request.auth.uid &&
+        data.title is string && data.title.size() >= 1 && data.title.size() <= 240 &&
+        data.subject is string && data.subject.size() <= 120 &&
+        data.topicTitle is string && data.topicTitle.size() <= 200 &&
+        data.sourceType is string && data.sourceType.size() <= 32 &&
+        data.sourceType in ['note', 'screenshot', 'pdf', 'url', 'class_reference', 'practice_note'] &&
+        data.content is string && data.content.size() <= 50000 &&
+        data.version is number && data.version >= 1 &&
+        (!('topicId' in data) || (data.topicId is string && data.topicId.size() <= 128)) &&
+        (!('sessionId' in data) || (data.sessionId is string && data.sessionId.size() <= 128)) &&
+        (!('originalExtractedText' in data) || (data.originalExtractedText is string && data.originalExtractedText.size() <= 50000)) &&
+        (!('sourceUrl' in data) || (data.sourceUrl is string && data.sourceUrl.size() <= 1000)) &&
+        (!('tagsCsv' in data) || (data.tagsCsv is string && data.tagsCsv.size() <= 500)) &&
+        (!('attachmentsMetaJson' in data) || (data.attachmentsMetaJson is string && data.attachmentsMetaJson.size() <= 200000)) &&
+        (!('historyJson' in data) || (data.historyJson is string && data.historyJson.size() <= 100000)) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidQuizAttempt(data) {
+      return data.userId is string && data.userId.size() <= 128 && data.userId.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.userId == request.auth.uid &&
+        data.quizType is string && data.quizType.size() <= 24 && data.quizType in ['mcq', 'descriptive', 'mock'] &&
+        data.subject is string && data.subject.size() <= 120 &&
+        data.topicTitle is string && data.topicTitle.size() <= 200 &&
+        data.totalQuestions is number && data.totalQuestions >= 1 &&
+        data.correctCount is number && data.correctCount >= 0 &&
+        data.incorrectCount is number && data.incorrectCount >= 0 &&
+        data.accuracy is number && data.accuracy >= 0 && data.accuracy <= 100 &&
+        data.durationSeconds is number && data.durationSeconds >= 0 &&
+        data.attemptDate is string && data.attemptDate.size() <= 32 &&
+        (!('topicId' in data) || (data.topicId is string && data.topicId.size() <= 128)) &&
+        (!('skippedCount' in data) || (data.skippedCount is number && data.skippedCount >= 0)) &&
+        (!('detailsJson' in data) || (data.detailsJson is string && data.detailsJson.size() <= 100000)) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidRevisionItem(data) {
+      return data.userId is string && data.userId.size() <= 128 && data.userId.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.userId == request.auth.uid &&
+        data.topicId is string && data.topicId.size() <= 128 &&
+        data.topicTitle is string && data.topicTitle.size() <= 200 &&
+        data.subject is string && data.subject.size() <= 120 &&
+        data.intervalDays is number && data.intervalDays >= 1 &&
+        data.dueDate is string && data.dueDate.size() <= 32 &&
+        data.status is string && data.status.size() <= 24 && data.status in ['due', 'upcoming', 'overdue', 'completed'] &&
+        data.recommendationReason is string && data.recommendationReason.size() <= 500 &&
+        (!('phase' in data) || (data.phase is string && data.phase.size() <= 64)) &&
+        (!('stageLabel' in data) || (data.stageLabel is string && data.stageLabel.size() <= 32)) &&
+        (!('confidence' in data) || (data.confidence is number && data.confidence >= 0 && data.confidence <= 5)) &&
+        (!('lastAccuracy' in data) || (data.lastAccuracy is number && data.lastAccuracy >= 0 && data.lastAccuracy <= 100)) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidCurrentAffair(data) {
+      return data.userId is string && data.userId.size() <= 128 && data.userId.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.userId == request.auth.uid &&
+        data.date is string && data.date.size() <= 32 &&
+        data.monthTag is string && data.monthTag.size() <= 32 &&
+        data.headline is string && data.headline.size() >= 1 && data.headline.size() <= 300 &&
+        data.summary is string && data.summary.size() <= 15000 &&
+        data.revisionStatus is string && data.revisionStatus.size() <= 40 &&
+        data.revisionStatus in ['Unreviewed', 'Reviewed Once', 'Revised & Mastered'] &&
+        (!('sourceUrl' in data) || (data.sourceUrl is string && data.sourceUrl.size() <= 1000)) &&
+        (!('keyFacts' in data) || (data.keyFacts is string && data.keyFacts.size() <= 10000)) &&
+        (!('regulatoryRelevance' in data) || (data.regulatoryRelevance is string && data.regulatoryRelevance.size() <= 2000)) &&
+        (!('esiConnection' in data) || (data.esiConnection is string && data.esiConnection.size() <= 2000)) &&
+        (!('financeConnection' in data) || (data.financeConnection is string && data.financeConnection.size() <= 2000)) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidAIInteraction(data) {
+      return data.userId is string && data.userId.size() <= 128 && data.userId.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.userId == request.auth.uid &&
+        data.actionType is string && data.actionType.size() <= 64 &&
+        data.prompt is string && data.prompt.size() <= 10000 &&
+        data.responseText is string && data.responseText.size() <= 50000 &&
+        (!('subject' in data) || (data.subject is string && data.subject.size() <= 120)) &&
+        (!('topicTitle' in data) || (data.topicTitle is string && data.topicTitle.size() <= 200)) &&
+        (!('sourceNoteTitles' in data) || (data.sourceNoteTitles is string && data.sourceNoteTitles.size() <= 2000)) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    match /users/{userId} {
+      allow get: if isOwner(userId) && isValidId(userId);
+      allow create: if isOwner(userId) && isValidId(userId) &&
+        isValidUserWorkspace(incoming()) &&
+        incoming().keys().hasAll(['userId', 'themeSeed', 'themeMode', 'dailyGoalMinutes', 'createdAt', 'updatedAt']) &&
+        incoming().keys().hasOnly(['userId', 'displayName', 'themeSeed', 'themeMode', 'dailyGoalMinutes', 'officeStart', 'officeEnd', 'workDays', 'revisionIntervals', 'activeTimerJson', 'customSubjectsJson', 'createdAt', 'updatedAt']) &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time;
+      allow update: if isOwner(userId) && isValidId(userId) &&
+        isValidUserWorkspace(incoming()) &&
+        incoming().userId == existing().userId &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'themeSeed', 'themeMode', 'dailyGoalMinutes', 'officeStart', 'officeEnd', 'workDays', 'revisionIntervals', 'activeTimerJson', 'customSubjectsJson', 'updatedAt']);
+      allow delete: if isOwner(userId) && isValidId(userId);
+
+      match /topics/{topicId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(topicId) && hasWorkspace(userId);
+        allow list: if isOwner(userId) && resource.data.userId == request.auth.uid;
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(topicId) &&
+          isValidTopic(incoming()) &&
+          incoming().keys().hasAll(['userId', 'phase', 'subject', 'chapter', 'title', 'status', 'studyMinutes', 'confidence', 'createdAt', 'updatedAt']) &&
+          incoming().keys().hasOnly(['userId', 'phase', 'subject', 'chapter', 'title', 'status', 'studyMinutes', 'practiceAccuracy', 'confidence', 'revisionStage', 'nextRevisionDate', 'lastStudiedAt', 'createdAt', 'updatedAt']) &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time &&
+          hasWorkspace(userId);
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(topicId) &&
+          isValidTopic(incoming()) &&
+          incoming().userId == existing().userId &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['phase', 'subject', 'chapter', 'title', 'status', 'studyMinutes', 'practiceAccuracy', 'confidence', 'revisionStage', 'nextRevisionDate', 'lastStudiedAt', 'updatedAt']) &&
+          hasWorkspace(userId);
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(topicId) && hasWorkspace(userId);
+      }
+
+      match /sessions/{sessionId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(sessionId) && hasWorkspace(userId);
+        allow list: if isOwner(userId) && resource.data.userId == request.auth.uid;
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(sessionId) &&
+          isValidStudySession(incoming()) &&
+          incoming().keys().hasAll(['userId', 'phase', 'subject', 'topicId', 'topicTitle', 'focusedMinutes', 'pausedMinutes', 'confidence', 'sessionDate', 'createdAt', 'updatedAt']) &&
+          incoming().keys().hasOnly(['userId', 'phase', 'subject', 'topicId', 'topicTitle', 'goal', 'timerMode', 'plannedMinutes', 'focusedMinutes', 'pausedMinutes', 'outcome', 'confidence', 'notesSummary', 'screenshotsCount', 'suggestedRevisionDate', 'sessionDate', 'createdAt', 'updatedAt']) &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time &&
+          hasWorkspace(userId);
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(sessionId) &&
+          isValidStudySession(incoming()) &&
+          incoming().userId == existing().userId &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['outcome', 'confidence', 'notesSummary', 'suggestedRevisionDate', 'updatedAt']) &&
+          hasWorkspace(userId);
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(sessionId) && hasWorkspace(userId);
+      }
+
+      match /tasks/{taskId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(taskId) && hasWorkspace(userId);
+        allow list: if isOwner(userId) && resource.data.userId == request.auth.uid;
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(taskId) &&
+          isValidRoutineTask(incoming()) &&
+          incoming().keys().hasAll(['userId', 'title', 'category', 'subject', 'date', 'startTime', 'durationMinutes', 'priority', 'status', 'createdAt', 'updatedAt']) &&
+          incoming().keys().hasOnly(['userId', 'title', 'category', 'subject', 'topicId', 'date', 'startTime', 'durationMinutes', 'priority', 'status', 'isRecurring', 'createdAt', 'updatedAt']) &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time &&
+          hasWorkspace(userId);
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(taskId) &&
+          isValidRoutineTask(incoming()) &&
+          incoming().userId == existing().userId &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['title', 'category', 'subject', 'topicId', 'date', 'startTime', 'durationMinutes', 'priority', 'status', 'isRecurring', 'updatedAt']) &&
+          hasWorkspace(userId);
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(taskId) && hasWorkspace(userId);
+      }
+
+      match /notes/{noteId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(noteId) && hasWorkspace(userId);
+        allow list: if isOwner(userId) && resource.data.userId == request.auth.uid;
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(noteId) &&
+          isValidVaultNote(incoming()) &&
+          incoming().keys().hasAll(['userId', 'title', 'subject', 'topicTitle', 'sourceType', 'content', 'version', 'createdAt', 'updatedAt']) &&
+          incoming().keys().hasOnly(['userId', 'title', 'subject', 'topicId', 'topicTitle', 'sessionId', 'sourceType', 'content', 'originalExtractedText', 'sourceUrl', 'tagsCsv', 'attachmentsMetaJson', 'version', 'historyJson', 'createdAt', 'updatedAt']) &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time &&
+          hasWorkspace(userId);
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(noteId) &&
+          isValidVaultNote(incoming()) &&
+          incoming().userId == existing().userId &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['title', 'subject', 'topicId', 'topicTitle', 'content', 'sourceUrl', 'tagsCsv', 'attachmentsMetaJson', 'version', 'historyJson', 'updatedAt']) &&
+          hasWorkspace(userId);
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(noteId) && hasWorkspace(userId);
+      }
+
+      match /quizzes/{quizId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(quizId) && hasWorkspace(userId);
+        allow list: if isOwner(userId) && resource.data.userId == request.auth.uid;
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(quizId) &&
+          isValidQuizAttempt(incoming()) &&
+          incoming().keys().hasAll(['userId', 'quizType', 'subject', 'topicTitle', 'totalQuestions', 'correctCount', 'incorrectCount', 'accuracy', 'durationSeconds', 'attemptDate', 'createdAt', 'updatedAt']) &&
+          incoming().keys().hasOnly(['userId', 'quizType', 'subject', 'topicId', 'topicTitle', 'totalQuestions', 'correctCount', 'incorrectCount', 'skippedCount', 'accuracy', 'durationSeconds', 'detailsJson', 'attemptDate', 'createdAt', 'updatedAt']) &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time &&
+          hasWorkspace(userId);
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(quizId) &&
+          isValidQuizAttempt(incoming()) &&
+          incoming().userId == existing().userId &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['detailsJson', 'updatedAt']) &&
+          hasWorkspace(userId);
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(quizId) && hasWorkspace(userId);
+      }
+
+      match /revisions/{revisionId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(revisionId) && hasWorkspace(userId);
+        allow list: if isOwner(userId) && resource.data.userId == request.auth.uid;
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(revisionId) &&
+          isValidRevisionItem(incoming()) &&
+          incoming().keys().hasAll(['userId', 'topicId', 'topicTitle', 'subject', 'intervalDays', 'dueDate', 'status', 'recommendationReason', 'createdAt', 'updatedAt']) &&
+          incoming().keys().hasOnly(['userId', 'topicId', 'topicTitle', 'subject', 'phase', 'intervalDays', 'stageLabel', 'dueDate', 'status', 'confidence', 'lastAccuracy', 'recommendationReason', 'createdAt', 'updatedAt']) &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time &&
+          hasWorkspace(userId);
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(revisionId) &&
+          isValidRevisionItem(incoming()) &&
+          incoming().userId == existing().userId &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['intervalDays', 'stageLabel', 'dueDate', 'status', 'confidence', 'lastAccuracy', 'recommendationReason', 'updatedAt']) &&
+          hasWorkspace(userId);
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(revisionId) && hasWorkspace(userId);
+      }
+
+      match /currentAffairs/{entryId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(entryId) && hasWorkspace(userId);
+        allow list: if isOwner(userId) && resource.data.userId == request.auth.uid;
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(entryId) &&
+          isValidCurrentAffair(incoming()) &&
+          incoming().keys().hasAll(['userId', 'date', 'monthTag', 'headline', 'summary', 'revisionStatus', 'createdAt', 'updatedAt']) &&
+          incoming().keys().hasOnly(['userId', 'date', 'monthTag', 'headline', 'sourceUrl', 'summary', 'keyFacts', 'regulatoryRelevance', 'esiConnection', 'financeConnection', 'revisionStatus', 'createdAt', 'updatedAt']) &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time &&
+          hasWorkspace(userId);
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(entryId) &&
+          isValidCurrentAffair(incoming()) &&
+          incoming().userId == existing().userId &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['date', 'monthTag', 'headline', 'sourceUrl', 'summary', 'keyFacts', 'regulatoryRelevance', 'esiConnection', 'financeConnection', 'revisionStatus', 'updatedAt']) &&
+          hasWorkspace(userId);
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(entryId) && hasWorkspace(userId);
+      }
+
+      match /interactions/{interactionId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(interactionId) && hasWorkspace(userId);
+        allow list: if isOwner(userId) && resource.data.userId == request.auth.uid;
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(interactionId) &&
+          isValidAIInteraction(incoming()) &&
+          incoming().keys().hasAll(['userId', 'actionType', 'prompt', 'responseText', 'createdAt', 'updatedAt']) &&
+          incoming().keys().hasOnly(['userId', 'actionType', 'subject', 'topicTitle', 'prompt', 'responseText', 'sourceNoteTitles', 'createdAt', 'updatedAt']) &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time &&
+          hasWorkspace(userId);
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(interactionId) &&
+          isValidAIInteraction(incoming()) &&
+          incoming().userId == existing().userId &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['responseText', 'sourceNoteTitles', 'updatedAt']) &&
+          hasWorkspace(userId);
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(interactionId) && hasWorkspace(userId);
+      }
+    }
+  }
+}

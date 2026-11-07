@@ -1,0 +1,243 @@
+{
+  "entities": {
+    "UserWorkspace": {
+      "title": "UserWorkspace",
+      "description": "User preferences, Material You theme studio configuration, office hours, and active study timer state.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "displayName": { "type": "string", "maxLength": 120 },
+        "themeSeed": { "type": "string", "maxLength": 32 },
+        "themeMode": { "type": "string", "enum": ["light", "dark", "system"], "maxLength": 16 },
+        "dailyGoalMinutes": { "type": "number" },
+        "officeStart": { "type": "string", "maxLength": 10 },
+        "officeEnd": { "type": "string", "maxLength": 10 },
+        "workDays": { "type": "string", "maxLength": 64 },
+        "revisionIntervals": { "type": "string", "maxLength": 64 },
+        "activeTimerJson": { "type": "string", "maxLength": 5000 },
+        "customSubjectsJson": { "type": "string", "maxLength": 20000 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "themeSeed", "themeMode", "dailyGoalMinutes", "createdAt", "updatedAt"]
+    },
+    "Topic": {
+      "title": "Topic",
+      "description": "Study topic within Phase -> Subject -> Chapter -> Topic hierarchy.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "phase": { "type": "string", "maxLength": 64 },
+        "subject": { "type": "string", "maxLength": 120 },
+        "chapter": { "type": "string", "maxLength": 160 },
+        "title": { "type": "string", "maxLength": 200 },
+        "status": {
+          "type": "string",
+          "enum": ["Not Started", "In Progress", "Lecture Completed", "Practice Completed", "Revision Due", "Mastered"],
+          "maxLength": 40
+        },
+        "studyMinutes": { "type": "number" },
+        "practiceAccuracy": { "type": "number" },
+        "confidence": { "type": "number" },
+        "revisionStage": { "type": "number" },
+        "nextRevisionDate": { "type": "string", "maxLength": 32 },
+        "lastStudiedAt": { "type": "string", "maxLength": 40 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "phase", "subject", "chapter", "title", "status", "studyMinutes", "confidence", "createdAt", "updatedAt"]
+    },
+    "StudySession": {
+      "title": "StudySession",
+      "description": "Recorded focused study session from the Focus Room with verified elapsed time.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "phase": { "type": "string", "maxLength": 64 },
+        "subject": { "type": "string", "maxLength": 120 },
+        "topicId": { "type": "string", "maxLength": 128 },
+        "topicTitle": { "type": "string", "maxLength": 200 },
+        "goal": { "type": "string", "maxLength": 500 },
+        "timerMode": { "type": "string", "enum": ["stopwatch", "countdown", "pomodoro"], "maxLength": 24 },
+        "plannedMinutes": { "type": "number" },
+        "focusedMinutes": { "type": "number" },
+        "pausedMinutes": { "type": "number" },
+        "outcome": { "type": "string", "maxLength": 120 },
+        "confidence": { "type": "number" },
+        "notesSummary": { "type": "string", "maxLength": 4000 },
+        "screenshotsCount": { "type": "number" },
+        "suggestedRevisionDate": { "type": "string", "maxLength": 32 },
+        "sessionDate": { "type": "string", "maxLength": 32 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "phase", "subject", "topicId", "topicTitle", "focusedMinutes", "pausedMinutes", "confidence", "sessionDate", "createdAt", "updatedAt"]
+    },
+    "RoutineTask": {
+      "title": "RoutineTask",
+      "description": "Planned daily or weekly study block, revision task, or current affairs task.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "title": { "type": "string", "maxLength": 200 },
+        "category": { "type": "string", "enum": ["lesson", "revision", "practice", "current_affairs", "mock"], "maxLength": 32 },
+        "subject": { "type": "string", "maxLength": 120 },
+        "topicId": { "type": "string", "maxLength": 128 },
+        "date": { "type": "string", "maxLength": 32 },
+        "startTime": { "type": "string", "maxLength": 16 },
+        "durationMinutes": { "type": "number" },
+        "priority": { "type": "string", "enum": ["high", "medium", "low"], "maxLength": 16 },
+        "status": { "type": "string", "enum": ["planned", "completed", "missed", "rescheduled"], "maxLength": 24 },
+        "isRecurring": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "title", "category", "subject", "date", "startTime", "durationMinutes", "priority", "status", "createdAt", "updatedAt"]
+    },
+    "VaultNote": {
+      "title": "VaultNote",
+      "description": "Knowledge Vault note, extracted screenshot OCR note, class reference, or PDF annotation.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "title": { "type": "string", "maxLength": 240 },
+        "subject": { "type": "string", "maxLength": 120 },
+        "topicId": { "type": "string", "maxLength": 128 },
+        "topicTitle": { "type": "string", "maxLength": 200 },
+        "sessionId": { "type": "string", "maxLength": 128 },
+        "sourceType": { "type": "string", "enum": ["note", "screenshot", "pdf", "url", "class_reference", "practice_note"], "maxLength": 32 },
+        "content": { "type": "string", "maxLength": 50000 },
+        "originalExtractedText": { "type": "string", "maxLength": 50000 },
+        "sourceUrl": { "type": "string", "maxLength": 1000 },
+        "tagsCsv": { "type": "string", "maxLength": 500 },
+        "attachmentsMetaJson": { "type": "string", "maxLength": 200000 },
+        "version": { "type": "number" },
+        "historyJson": { "type": "string", "maxLength": 100000 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "title", "subject", "topicTitle", "sourceType", "content", "version", "createdAt", "updatedAt"]
+    },
+    "QuizAttempt": {
+      "title": "QuizAttempt",
+      "description": "Completed MCQ quiz or descriptive practice attempt with mistake taxonomy.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "quizType": { "type": "string", "enum": ["mcq", "descriptive", "mock"], "maxLength": 24 },
+        "subject": { "type": "string", "maxLength": 120 },
+        "topicId": { "type": "string", "maxLength": 128 },
+        "topicTitle": { "type": "string", "maxLength": 200 },
+        "totalQuestions": { "type": "number" },
+        "correctCount": { "type": "number" },
+        "incorrectCount": { "type": "number" },
+        "skippedCount": { "type": "number" },
+        "accuracy": { "type": "number" },
+        "durationSeconds": { "type": "number" },
+        "detailsJson": { "type": "string", "maxLength": 100000 },
+        "attemptDate": { "type": "string", "maxLength": 32 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "quizType", "subject", "topicTitle", "totalQuestions", "correctCount", "incorrectCount", "accuracy", "durationSeconds", "attemptDate", "createdAt", "updatedAt"]
+    },
+    "RevisionItem": {
+      "title": "RevisionItem",
+      "description": "Spaced repetition review schedule item (Day 1, 3, 7, 14, 30).",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "topicId": { "type": "string", "maxLength": 128 },
+        "topicTitle": { "type": "string", "maxLength": 200 },
+        "subject": { "type": "string", "maxLength": 120 },
+        "phase": { "type": "string", "maxLength": 64 },
+        "intervalDays": { "type": "number" },
+        "stageLabel": { "type": "string", "maxLength": 32 },
+        "dueDate": { "type": "string", "maxLength": 32 },
+        "status": { "type": "string", "enum": ["due", "upcoming", "overdue", "completed"], "maxLength": 24 },
+        "confidence": { "type": "number" },
+        "lastAccuracy": { "type": "number" },
+        "recommendationReason": { "type": "string", "maxLength": 500 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "topicId", "topicTitle", "subject", "intervalDays", "dueDate", "status", "recommendationReason", "createdAt", "updatedAt"]
+    },
+    "CurrentAffair": {
+      "title": "CurrentAffair",
+      "description": "Daily Current Affairs & RBI Notification entry linked to ESI and Finance.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "date": { "type": "string", "maxLength": 32 },
+        "monthTag": { "type": "string", "maxLength": 32 },
+        "headline": { "type": "string", "maxLength": 300 },
+        "sourceUrl": { "type": "string", "maxLength": 1000 },
+        "summary": { "type": "string", "maxLength": 15000 },
+        "keyFacts": { "type": "string", "maxLength": 10000 },
+        "regulatoryRelevance": { "type": "string", "maxLength": 2000 },
+        "esiConnection": { "type": "string", "maxLength": 2000 },
+        "financeConnection": { "type": "string", "maxLength": 2000 },
+        "revisionStatus": { "type": "string", "enum": ["Unreviewed", "Reviewed Once", "Revised & Mastered"], "maxLength": 40 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "date", "monthTag", "headline", "summary", "revisionStatus", "createdAt", "updatedAt"]
+    },
+    "AIInteraction": {
+      "title": "AIInteraction",
+      "description": "User interaction with the Gemini AI Study Tutor grounded in personal notes.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "actionType": { "type": "string", "maxLength": 64 },
+        "subject": { "type": "string", "maxLength": 120 },
+        "topicTitle": { "type": "string", "maxLength": 200 },
+        "prompt": { "type": "string", "maxLength": 10000 },
+        "responseText": { "type": "string", "maxLength": 50000 },
+        "sourceNoteTitles": { "type": "string", "maxLength": 2000 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "actionType", "prompt", "responseText", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserWorkspace" },
+      "description": "Root user workspace document containing preferences, theme configuration, and active timer state."
+    },
+    "/users/{userId}/topics/{topicId}": {
+      "schema": { "$ref": "#/entities/Topic" },
+      "description": "User's study topics across Phase I, Phase II, and additional RBI categories."
+    },
+    "/users/{userId}/sessions/{sessionId}": {
+      "schema": { "$ref": "#/entities/StudySession" },
+      "description": "User's verified focused study sessions."
+    },
+    "/users/{userId}/tasks/{taskId}": {
+      "schema": { "$ref": "#/entities/RoutineTask" },
+      "description": "User's daily routine planner blocks and tasks."
+    },
+    "/users/{userId}/notes/{noteId}": {
+      "schema": { "$ref": "#/entities/VaultNote" },
+      "description": "User's Knowledge Vault notes, extracted screenshot notes, and references."
+    },
+    "/users/{userId}/quizzes/{quizId}": {
+      "schema": { "$ref": "#/entities/QuizAttempt" },
+      "description": "User's interactive quiz and mock test attempt records."
+    },
+    "/users/{userId}/revisions/{revisionId}": {
+      "schema": { "$ref": "#/entities/RevisionItem" },
+      "description": "User's spaced repetition schedule items."
+    },
+    "/users/{userId}/currentAffairs/{entryId}": {
+      "schema": { "$ref": "#/entities/CurrentAffair" },
+      "description": "User's Current Affairs & RBI notifications notebook entries."
+    },
+    "/users/{userId}/interactions/{interactionId}": {
+      "schema": { "$ref": "#/entities/AIInteraction" },
+      "description": "User's grounded Gemini AI Tutor interaction history."
+    }
+  }
+}

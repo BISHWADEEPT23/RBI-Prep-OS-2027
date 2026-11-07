@@ -1,0 +1,54 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Production and Distribution Builds
+dist/
+dist-electron/
+dist-gh-pages/
+build/
+release/
+
+# User Data, Local Databases, and Backups
+userData/
+backups/
+*.backup.json
+*.tmp
+*.bak
+*.blockmap
+
+# Environment Variables & Secrets
+.env
+.env.local
+.env.*.local
+.env.production
+.env.staging
+!.env.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Test Coverage & Artifacts
+coverage/
+.nyc_output/
+test-results/
+
+# OS Files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Agent & IDE Configurations
+.agents/
+.antigravity/
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
